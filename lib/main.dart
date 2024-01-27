@@ -1,5 +1,6 @@
 import 'package:calculator/button.dart';
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +31,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String userQuestion = "";
   String userAnswer = "";
+  double fontSizerA = 20;
 
   final List<String> buttons = [
     "C",
@@ -44,9 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
     "5",
     "4",
     "-",
-    "3",
-    "2",
     "1",
+    "2",
+    "3",
     "+",
     "0",
     ".",
@@ -83,9 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   alignment: Alignment.centerRight,
                   child: Text(
                     userAnswer,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.amber,
-                      fontSize: 20,
+                      fontSize: fontSizerA,
                     ),
                   ),
                 ),
@@ -138,12 +140,21 @@ class _MyHomePageState extends State<MyHomePage> {
                       buttonText: buttons[index],
                       textColor: Colors.black,
                     );
+                  } else if (buttons[index] == '=') {
+                    return MyButton(
+                      onTap: () => finishArith(),
+                      color: Colors.amber,
+                      buttonText: buttons[index],
+                      textColor: Colors.white,
+                    );
                   } else {
                     return MyButton(
                       onTap: () {
+                        startArith();
                         setState(() {
                           userQuestion += buttons[index];
                         });
+                        performArith();
                       },
                       color: isOperator(buttons[index])
                           ? Colors.amber
@@ -168,5 +179,28 @@ class _MyHomePageState extends State<MyHomePage> {
       return true;
     }
     return false;
+  }
+
+  performArith() {
+    Parser parser = Parser();
+    Expression exp = parser.parse(userQuestion);
+    ContextModel cm = ContextModel();
+    double eval = exp.evaluate(EvaluationType.REAL, cm);
+
+    setState(() {
+      userAnswer = eval.toString();
+    });
+  }
+
+  startArith() {
+    setState(() {
+      fontSizerA = 20;
+    });
+  }
+
+  finishArith() {
+    setState(() {
+      fontSizerA = 30;
+    });
   }
 }
