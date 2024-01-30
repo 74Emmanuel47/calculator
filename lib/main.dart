@@ -32,6 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String userQuestion = "";
   String userAnswer = "";
   double fontSizerA = 20;
+  Color colorAnswer = Colors.black87;
 
   final List<String> buttons = [
     "C",
@@ -41,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "9",
     "8",
     "7",
-    "X",
+    "x",
     "6",
     "5",
     "4",
@@ -86,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     userAnswer,
                     style: TextStyle(
-                      color: Colors.amber,
+                      color: colorAnswer,
                       fontSize: fontSizerA,
                     ),
                   ),
@@ -96,77 +97,75 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             flex: 2,
-            child: Container(
-              child: GridView.builder(
-                itemCount: buttons.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                ),
-                itemBuilder: (context, index) {
-                  if (buttons[index] == 'C') {
-                    return MyButton(
-                      onTap: () {
-                        setState(() {
-                          userAnswer = "";
-                          userQuestion = "";
-                        });
-                      },
-                      color: Colors.amber.shade200,
-                      buttonText: buttons[index],
-                      textColor: Colors.black,
-                    );
-                  } else if (buttons[index] == 'DEL') {
-                    return MyButton(
-                      onTap: () {
-                        setState(() {
-                          userQuestion = userQuestion.substring(
-                              0, userQuestion.length - 1);
-                        });
-                      },
-                      color: Colors.amber.shade200,
-                      buttonText: buttons[index],
-                      textColor: Colors.black,
-                    );
-                  } else if (buttons[index] == 'ANS') {
-                    return MyButton(
-                      onTap: () {
-                        if (userAnswer != "") {
-                          setState(() {
-                            userQuestion = userAnswer;
-                          });
-                        }
-                      },
-                      color: Colors.amber.shade200,
-                      buttonText: buttons[index],
-                      textColor: Colors.black,
-                    );
-                  } else if (buttons[index] == '=') {
-                    return MyButton(
-                      onTap: () => finishArith(),
-                      color: Colors.amber,
-                      buttonText: buttons[index],
-                      textColor: Colors.white,
-                    );
-                  } else {
-                    return MyButton(
-                      onTap: () {
-                        startArith();
-                        setState(() {
-                          userQuestion += buttons[index];
-                        });
-                        performArith();
-                      },
-                      color: isOperator(buttons[index])
-                          ? Colors.amber
-                          : Colors.white,
-                      buttonText: buttons[index],
-                      textColor: isOperator(buttons[index])
-                          ? Colors.white
-                          : Colors.amber,
-                    );
-                  }
-                },
+            child: GridView.builder(
+              itemCount: buttons.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
               ),
+              itemBuilder: (context, index) {
+                if (buttons[index] == 'C') {
+                  return MyButton(
+                    onTap: () {
+                      setState(() {
+                        userAnswer = "";
+                        userQuestion = "";
+                      });
+                    },
+                    color: Colors.amber.shade200,
+                    buttonText: buttons[index],
+                    textColor: Colors.black,
+                  );
+                } else if (buttons[index] == 'DEL') {
+                  return MyButton(
+                    onTap: () {
+                      setState(() {
+                        userQuestion =
+                            userQuestion.substring(0, userQuestion.length - 1);
+                      });
+                    },
+                    color: Colors.amber.shade200,
+                    buttonText: buttons[index],
+                    textColor: Colors.black,
+                  );
+                } else if (buttons[index] == 'ANS') {
+                  return MyButton(
+                    onTap: () {
+                      if (userAnswer != "") {
+                        setState(() {
+                          userQuestion = userAnswer;
+                        });
+                      }
+                    },
+                    color: Colors.amber.shade200,
+                    buttonText: buttons[index],
+                    textColor: Colors.black,
+                  );
+                } else if (buttons[index] == '=') {
+                  return MyButton(
+                    onTap: () => finishArith(),
+                    color: Colors.amber,
+                    buttonText: buttons[index],
+                    textColor: Colors.white,
+                  );
+                } else {
+                  return MyButton(
+                    onTap: () {
+                      startArith();
+                      setState(() {
+                        userQuestion += buttons[index];
+                      });
+                      performArith();
+                    },
+                    color: isOperator(buttons[index])
+                        ? Colors.amber
+                        : Colors.white,
+                    buttonText: buttons[index],
+                    textColor: isOperator(buttons[index])
+                        ? Colors.white
+                        : Colors.amber,
+                  );
+                }
+              },
             ),
           ),
         ],
@@ -175,15 +174,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool isOperator(String x) {
-    if (x == '%' || x == '/' || x == 'X' || x == '-' || x == '+' || x == '=') {
+    if (x == '%' || x == '/' || x == 'x' || x == '-' || x == '+' || x == '=') {
       return true;
     }
     return false;
   }
 
   performArith() {
+    String finalQuestion = userQuestion.replaceAll("x", "*");
     Parser parser = Parser();
-    Expression exp = parser.parse(userQuestion);
+    Expression exp = parser.parse(finalQuestion);
     ContextModel cm = ContextModel();
     double eval = exp.evaluate(EvaluationType.REAL, cm);
 
@@ -194,12 +194,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   startArith() {
     setState(() {
+      colorAnswer = Colors.amber;
       fontSizerA = 20;
     });
   }
 
   finishArith() {
     setState(() {
+      colorAnswer = Colors.black;
       fontSizerA = 30;
     });
   }
