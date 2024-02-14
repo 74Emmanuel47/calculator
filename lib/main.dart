@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Calculator',
+      debugShowCheckedModeBanner: false,
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -30,9 +31,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String userQuestion = "";
-  String userAnswer = "";
+  String userAnswer = "0";
   double fontSizerA = 20;
-  Color colorAnswer = Colors.black87;
+  Color colorAnswer = Colors.amber;
 
   final List<String> buttons = [
     "C",
@@ -107,8 +108,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   return MyButton(
                     onTap: () {
                       setState(() {
-                        userAnswer = "";
+                        userAnswer = "0";
                         userQuestion = "";
+                        colorAnswer = Colors.amber;
+                        fontSizerA = 20;
                       });
                     },
                     color: Colors.amber.shade200,
@@ -122,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         userQuestion =
                             userQuestion.substring(0, userQuestion.length - 1);
                       });
+                      performArith();
                     },
                     color: Colors.amber.shade200,
                     buttonText: buttons[index],
@@ -181,15 +185,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   performArith() {
-    String finalQuestion = userQuestion.replaceAll("x", "*");
-    Parser parser = Parser();
-    Expression exp = parser.parse(finalQuestion);
-    ContextModel cm = ContextModel();
-    double eval = exp.evaluate(EvaluationType.REAL, cm);
+    if (userQuestion.isNotEmpty) {
+      String finalQuestion = userQuestion.replaceAll("x", "*");
 
-    setState(() {
-      userAnswer = eval.toString();
-    });
+      if (userQuestion.contains("%")) {
+        finalQuestion = finalQuestion.replaceAll("%", "/100");
+      }
+
+      Parser parser = Parser();
+      Expression exp = parser.parse(finalQuestion);
+      ContextModel cm = ContextModel();
+      double eval = exp.evaluate(EvaluationType.REAL, cm);
+
+      setState(() {
+        userAnswer = eval.toString();
+      });
+    } else {
+      setState(() {
+        userAnswer = "0";
+        colorAnswer = Colors.amber;
+        fontSizerA = 20;
+      });
+    }
   }
 
   startArith() {
